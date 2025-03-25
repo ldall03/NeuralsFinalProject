@@ -1,28 +1,53 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import data_proc as data
 
-if __name__ == '__main__':
-    # Load and prepare data
-    print("Loading data...")
-    movie_df = pd.read_csv('res/movie.csv').drop(columns=['title'])
-    ratings_df = pd.read_csv('res/rating.csv').drop(columns=['timestamp'])
 
-    df = pd.merge(movie_df, ratings_df, on='movieId')
-    df = df.drop_duplicates()
+def load_data(dataset='100k'):
+    if dataset == '100k':
+        return data.load_100k()
+    elif dataset == '20m':
+        return data.load_20m()
+    raise Exception('Invalid dataset')
 
-    genre_count = df.groupby('genres').size().reset_index(name='count').sort_values('count', ascending=False)
-    print(genre_count)
+def common_interests(id, df):
+    uvec = df.iloc[id].values[1:]
+    df = df.drop(id)
+    def combine(row): # bitwise and the genre vector with every other user and sum the result
+        ivec = row.values[1:]
+        comb = [i & j for (i, j) in zip(uvec, ivec)]
+        return sum(comb)
 
-    # TODO: bar chart with genre_count
-
-    rating_count = df.groupby('movieId').size().reset_index(name='count')
-    user_count = df.groupby('userId').size().reset_index(name='count')
+    df['common_genre_count'] = df.apply(combine, axis=1)
+    return df['common_genre_count']
     
-    movie_50_ratings = rating_count[rating_count['count'] > 50]
-    user_50_ratings = user_count[user_count['count'] > 50]
+    
+if __name__ == '__main__':
+    print("Loading data...")
+    df = load_data()
 
-    print("Movies with more than 50 ratings: ", len(movie_50_ratings))
-    print("Users who rated more than 50 movies: ", len(user_50_ratings))
+    # Showing genre distribution
+    genre_count = data.genre_count(df) 
+    plt.bar(genre_count.index, genre_count.values)
+    plt.xlabel('Movie Genres')
+    plt.ylabel('Count')
+    plt.title('Number of Movies in Each Genre')
+    plt.show()
 
-    # TODO Find users with common interests
+    # Getting movies and users with more than 50 ratings
+    n_movie_ratings = data.ratings_per_movie(df)
+    n_user_ratings = data.ratings_per_user(df)
 
-    ## PART 4: MLP ##
+    ratings_50p = n_movie_ratings[n_movie_ratings > 50]
+    users_50p = n_user_ratings[n_user_ratings > 50]
+
+    print(f"There are {len(ratings_50p)} movies with more than 50 ratings.") 
+    print(f"There are {len(users_50p)} users who rated more than 50 movies.") 
+
+    # Find users with common genre interests
+    user_genres_df = data.user_genres_watched(df)
+    u_id = int(input('Choose a user ID to see which other users share comment interests: '))
+    shared_int = common_interests(u_id, user_genres_df)
+    com_genre2p = shared_int[shared_int >= 2]
+    print(f"Here are users that share at least two common genres with user {u_id}: ", com_genre2p.index[:10])
+
