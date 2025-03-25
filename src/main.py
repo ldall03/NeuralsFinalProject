@@ -11,7 +11,7 @@ def load_data(dataset='100k'):
     raise Exception('Invalid dataset')
 
 def common_interests(id, df):
-    uvec = df.iloc[id].values[1:]
+    uvec = df.loc[id].values[1:]
     df = df.drop(id)
     def combine(row): # bitwise and the genre vector with every other user and sum the result
         ivec = row.values[1:]
