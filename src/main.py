@@ -1,3 +1,4 @@
+import random
 import pandas as pd
 import matplotlib.pyplot as plt
 import joblib
@@ -56,6 +57,7 @@ if __name__ == '__main__':
     # print(f"Here are users that share at least two common genres with user {u_id}: ", com_genre2p.index[:10])
 
     # MLP stuff
+
     user_input = input("Do you want to train a model or load one? [train/load]: ")
     model = None
     if user_input == 'load':
@@ -66,7 +68,6 @@ if __name__ == '__main__':
     elif user_input == 'train':
         print("Performing grid search and k-fold cross validation to train MLP.")
         model = mlp.gscv_model(df)
-        print(f"The RMSE using grid search with k-fold cross validation is: {score}.")
 
         joblib.dump(model, '../models/initial_mlp.pkl')
         print("Model saved at models/initial_mlp.pkl")
@@ -79,6 +80,6 @@ if __name__ == '__main__':
     pred_for_score = list(zip(y_pred, y))
     print("The MSE for the model is: ", mean_squared_error(y, y_pred))
     print("Here are the first 20 predictions:")
-    for (pred, y) in pred_for_score[:20]:
-        print(round(pred), int(y))
+    for (pred, y) in random.sample(pred_for_score, 20):
+        print(round(pred, 2), int(y))
 

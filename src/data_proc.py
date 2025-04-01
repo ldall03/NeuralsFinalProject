@@ -81,3 +81,12 @@ def user_genres_watched(df):
     user_genre_df = df.groupby('user_id').max()[GENRES]
     return user_genre_df
 
+def rating_analysis(df):
+    l = len(df)
+    print("Rating mean: ", df['rating'].mean())
+    print("Rating median: ", df['rating'].median())
+    rating_count = df.groupby('rating').count()['user_id']
+    for i, r in enumerate(rating_count):
+        print(f"{int(r / l * 100)}% of entries were rated {i+1} stars.")
+
+
