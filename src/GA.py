@@ -63,8 +63,8 @@ class MLP_GA():
         if self.best_params is None:
             raise Exception("Run the GA before training the best MLP.")
         (hls, act, sol, lri, mxi) = self.best_params
-        mlp = MLPClassifier(hidden_layer_sizes=hls, activation=act, solver=sol, learning_rate_init=lri, max_ite=mxi, random_state=42)
-        mlp.fit(X_train, y_train)
+        mlp = MLPClassifier(hidden_layer_sizes=hls, activation=act, solver=sol, learning_rate_init=lri, max_iter=mxi, random_state=42)
+        mlp.fit(self.X_train, self.y_train)
         return mlp
 
     # Returns best parameters in form (hls, act, sol, lri, mxi)
@@ -73,7 +73,7 @@ class MLP_GA():
             raise Exception("GA not properly initialized.")
 
         fitness_function = self.fitness_func
-        num_generations = 3            # def 50
+        num_generations = 3             # def 50
         num_parents_mating = 4          # def 4
         sol_per_pop = 8                 # def 8
         num_genes = len(param_grid)
