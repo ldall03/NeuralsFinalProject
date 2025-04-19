@@ -89,4 +89,21 @@ def rating_analysis(df):
     for i, r in enumerate(rating_count):
         print(f"{int(r / l * 100)}% of entries were rated {i+1} stars.")
 
+def train_test_split_df(df, size=0.2, random_state=0):
+    s = int(size * len(df))
+    df_split = df.sample(n=s, random_state=random_state)
+    df_remaining = df.drop(df_split.index)
+    return df_remaining, df_split
+
+def create_cbcf_df(cbf_model, cf_model, df):
+    cbf_pred = cbf_model.predict(df)
+    cf_pred = cf_model.predict(df)
+    print(cbf_model.mse, cf_model.mse)
+    df['cbf_pred'] = cbf_pred
+    df['cf_pred'] = cf_pred
+
+    df = df.drop(columns=GENRES)
+
+    return df
+
 
