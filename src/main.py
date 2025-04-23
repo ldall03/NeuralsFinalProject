@@ -96,7 +96,7 @@ if __name__ == '__main__':
     y = cbcf_test_df['rating'].values
     y_pred = model.predict(X)
     pred_for_score = list(zip(y_pred, y))
-    print("The accuracy for the model is: ", mean_squared_error(y, y_pred))
+    print("The accuracy for the model is: ", accuracy_score(y, y_pred))
     print("Here are 20 random predictions:")
     for (pred, y) in random.sample(pred_for_score, 20):
         print(round(pred, 2), int(y))
